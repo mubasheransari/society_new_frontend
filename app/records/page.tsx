@@ -120,10 +120,7 @@ export default function RecordsPage() {
   const [filter, setFilter] = useState<'all' | InvoiceStatus>('all');
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [openRows, setOpenRows] = useState<Record<string, boolean>>({});
+    const [openRows, setOpenRows] = useState<Record<string, boolean>>({});
   const [addPortionRows, setAddPortionRows] = useState<Record<string, boolean>>({});
   const [portionForms, setPortionForms] = useState<Record<string, PortionForm>>({});
   const [savingPortion, setSavingPortion] = useState<Record<string, boolean>>({});
@@ -238,7 +235,7 @@ export default function RecordsPage() {
     if (paymentAmount <= 0) return setErr('Please enter a valid payment amount.');
 
     setErr(null);
-    setMessage(null);
+    postMessage(null);
     setSavingPayment((prev) => ({ ...prev, [key]: true }));
     try {
       const res = await fetch(`${API_BASE}/api/dues/${encodeURIComponent(row.plotNo)}/generate-invoice`, {
@@ -265,7 +262,7 @@ export default function RecordsPage() {
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json?.message || 'Failed to submit portion payment');
-      setMessage(`Payment submitted for Plot ${row.plotNo} - ${portion.portionName || 'portion'}.`);
+      postMessage(`Payment submitted for Plot ${row.plotNo} - ${portion.portionName || 'portion'}.`);
       setPortionPaymentForms((prev) => ({ ...prev, [key]: emptyPortionPaymentForm() }));
       setActivePaymentRows((prev) => ({ ...prev, [key]: false }));
       await load();
@@ -282,7 +279,7 @@ export default function RecordsPage() {
     if (!form.portionName.trim()) return setErr('Portion name is required.');
     if (!form.chargeCategory) return setErr('Portion category is required.');
     setErr(null);
-    setMessage(null);
+    postMessage(null);
     setSavingPortion((prev) => ({ ...prev, [plotNo]: true }));
     try {
       const res = await fetch(`${API_BASE}/api/dues/${encodeURIComponent(plotNo)}/portions`, {
@@ -301,7 +298,7 @@ export default function RecordsPage() {
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json?.message || 'Failed to save portion');
-      setMessage(`Portion added successfully in plot ${plotNo}.`);
+      postMessage(`Portion added successfully in plot ${plotNo}.`);
       setPortionForms((prev) => ({ ...prev, [plotNo]: { ...emptyPortionForm } }));
       setAddPortionRows((prev) => ({ ...prev, [plotNo]: false }));
       await load();
@@ -317,12 +314,12 @@ export default function RecordsPage() {
     if (!portionId) return;
     if (!window.confirm('Delete this portion?')) return;
     setErr(null);
-    setMessage(null);
+    postMessage(null);
     try {
       const res = await fetch(`${API_BASE}/api/dues/${encodeURIComponent(plotNo)}/portions/${portionId}`, { method: 'DELETE' });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json?.message || 'Failed to delete portion');
-      setMessage('Portion deleted successfully.');
+      postMessage('Portion deleted successfully.');
       await load();
       setOpenRows((prev) => ({ ...prev, [plotNo]: true }));
     } catch (e: any) {
@@ -346,29 +343,6 @@ export default function RecordsPage() {
     return { totalHouses, monthlyPaid, monthlyUnpaid, partiallyPaid };
   }, [rows]);
 
-  async function upload() {
-    if (!file) return setErr('Please choose an Excel file first.');
-    setUploading(true);
-    setErr(null);
-    setMessage(null);
-    try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const res = await fetch(`${API_BASE}/api/dues/upload`, { method: 'POST', body: fd });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data?.message || 'Upload failed');
-      setMessage(data?.message || 'File uploaded successfully.');
-      setFile(null);
-      const input = document.getElementById('recordsExcelUpload') as HTMLInputElement | null;
-      if (input) input.value = '';
-      await load();
-    } catch (e: any) {
-      setErr(e?.message || 'Upload failed');
-    } finally {
-      setUploading(false);
-    }
-  }
-
   return (
     <div className="wrap wideWrap">
       <div className="card recordsCard">
@@ -385,18 +359,6 @@ export default function RecordsPage() {
           <StatCard title="Monthly Paid" value={String(stats.monthlyPaid)} subtitle="Fully paid for current month" />
           <StatCard title="Monthly Unpaid" value={String(stats.monthlyUnpaid)} subtitle="No payment received" />
           <StatCard title="Partially Paid" value={String(stats.partiallyPaid)} subtitle="Balance still pending" />
-        </div>
-
-        <div className="subCard" style={{ marginBottom: 16 }}>
-          <div className="sectionTitleRow"><h2 className="h2">File Uploading</h2></div>
-          <div className="searchRow">
-            <div className="field growField">
-              <label className="lbl">Excel File (.xlsx)</label>
-              <input id="recordsExcelUpload" className="inp" type="file" accept=".xlsx,.xls" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-            </div>
-            <div className="stackEnd"><button className="btn primary" onClick={upload} disabled={uploading}>{uploading ? 'Uploading...' : 'Upload File'}</button></div>
-          </div>
-          {message && <div className="alert success">{message}</div>}
         </div>
 
         <div className="searchRow">
