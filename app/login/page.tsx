@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { API_BASE } from '../lib/resident';
 import { normalizeCurrentUser, saveAdminSession, type CurrentUser } from '../lib/access';
 
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('admin@invoice.com');
