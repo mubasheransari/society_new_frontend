@@ -5,6 +5,7 @@ import { Fragment, useEffect, useMemo, useState } from 'react';
 
 type InvoiceStatus = 'unpaid' | 'partially_paid' | 'paid';
 
+
 type Portion = {
   id?: number;
   portionName?: string;
