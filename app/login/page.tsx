@@ -26,10 +26,12 @@ export default function AdminLoginPage() {
       saveAdminSession(json.token, normalizeCurrentUser(json.user as CurrentUser));
       router.push('/');
     } catch (err: any) { setError(err?.message || 'Login failed'); }
-    finally { setBusy(false); }
+    finally { 
+      setBusy(false); 
+    }
   }
 
-  
+
   return (
     <main className="authPage adminAuthPage">
       <section className="authShowcase">
