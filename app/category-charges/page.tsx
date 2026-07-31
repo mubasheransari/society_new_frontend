@@ -197,12 +197,7 @@ export default function CategoryChargesPage() {
           <span>Actual charges are the original dues. Discounted charges are the revised payable dues. Future invoices use the owner discounted amount by default. Add New House will show these category options automatically.</span>
         </div>
 
-        <div className="statGrid4">
-          <div className="miniStat"><span>Owner actual total</span><strong>{money(totals.ownerActual)}</strong></div>
-          <div className="miniStat"><span>Owner discounted total</span><strong>{money(totals.ownerDiscounted)}</strong></div>
-          <div className="miniStat"><span>Rental actual total</span><strong>{money(totals.rentalActual)}</strong></div>
-          <div className="miniStat"><span>Rental discounted total</span><strong>{money(totals.rentalDiscounted)}</strong></div>
-        </div>
+   
 
         <div className="sectionTitle">Add New Category</div>
         <div className="formGrid4 compactGrid">
