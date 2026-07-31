@@ -14,6 +14,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [ready, setReady] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
 
   const isResident = pathname.startsWith('/resident');
   const isResidentLogin = pathname === '/resident/login';
@@ -37,6 +38,12 @@ export default function AppShell({ children }: { children: ReactNode }) {
     setReady(true);
   }, [isResident, isResidentLogin, isAdminLogin, router]);
 
+  // Close the mobile nav drawer whenever the route changes (e.g. after
+  // tapping a link), so it doesn't stay open over the new page.
+  useEffect(() => {
+    setNavOpen(false);
+  }, [pathname]);
+
   if (isResidentLogin || isAdminLogin) {
     return <div className="appContent soloContent">{children}</div>;
   }
@@ -49,10 +56,25 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="appShell">
-      {isResident ? <ResidentSidebar /> : <Sidebar />}
+      {isResident ? (
+        <ResidentSidebar mobileOpen={navOpen} onClose={() => setNavOpen(false)} />
+      ) : (
+        <Sidebar mobileOpen={navOpen} onClose={() => setNavOpen(false)} />
+      )}
+      {navOpen && <div className="navBackdrop no-print" onClick={() => setNavOpen(false)} />}
       <div className="appContent">
         <div className="topBar no-print">
           <div className="flatTopTitle">
+            <button
+              type="button"
+              className="navToggleBtn"
+              aria-label={navOpen ? 'Close menu' : 'Open menu'}
+              onClick={() => setNavOpen((v) => !v)}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
             <strong>{title}</strong>
           </div>
           <div className="topRightTools">

@@ -17,7 +17,7 @@ const items: Array<{ href: string; label: string; key: NavKey; icon: string }> =
   { href: '/settings', label: 'Settings', key: 'settings', icon: '⚙' },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<CurrentUser>(getCurrentUser());
@@ -31,13 +31,14 @@ export default function Sidebar() {
 
   function logout() {
     clearAdminSession();
+    onClose?.();
     router.push('/login');
   }
 
   const allowedItems = items.filter((it) => hasAccess(user, it.key));
 
   return (
-    <aside className="sb">
+    <aside className={`sb ${mobileOpen ? 'sbOpen' : ''}`}>
       <div className="brand">
         <div className="logo logoImgWrap"><img src="/logo.png" alt="Lucknow Co-operative Housing Society" className="logoImg" /></div>
         <div>
@@ -56,7 +57,7 @@ export default function Sidebar() {
         {allowedItems.map((it) => {
           const active = pathname === it.href;
           return (
-            <Link key={it.href} href={it.href} className={`link ${active ? 'active' : ''}`}>
+            <Link key={it.href} href={it.href} className={`link ${active ? 'active' : ''}`} onClick={onClose}>
               <span className="navIcon">{it.icon}</span>
               <span>{it.label}</span>
             </Link>

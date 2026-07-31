@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import AppShell from './components/AppShell';
 
@@ -11,6 +11,15 @@ export const metadata: Metadata = {
     shortcut: '/logo.png',
     apple: '/logo.png',
   },
+};
+
+// Without this, mobile browsers render the page at a fixed desktop-width
+// canvas (~980px) and zoom out to fit the screen, so the existing
+// `@media (max-width: ...)` rules in globals.css never actually trigger.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

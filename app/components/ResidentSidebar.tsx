@@ -15,7 +15,7 @@ const items = [
   { href: '/resident/change-password', label: 'Change Password', icon: '⚙' },
 ];
 
-export default function ResidentSidebar() {
+export default function ResidentSidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
   const [resident, setResident] = useState<ResidentSession>({});
@@ -30,11 +30,12 @@ export default function ResidentSidebar() {
   function logout() {
     localStorage.removeItem('resident-token');
     localStorage.removeItem('resident-session');
+    onClose?.();
     router.push('/resident/login');
   }
 
   return (
-    <aside className="sb">
+    <aside className={`sb ${mobileOpen ? 'sbOpen' : ''}`}>
       <div className="brand">
         <div className="logo logoImgWrap"><img src="/logo.png" alt="Lucknow Co-operative Housing Society" className="logoImg" /></div>
         <div>
@@ -49,7 +50,7 @@ export default function ResidentSidebar() {
       </div>
       <nav className="nav">
         {items.map((it) => (
-          <Link key={it.href} href={it.href} className={`link ${pathname === it.href ? 'active' : ''}`}>
+          <Link key={it.href} href={it.href} className={`link ${pathname === it.href ? 'active' : ''}`} onClick={onClose}>
             <span className="navIcon">{it.icon}</span>
             <span>{it.label}</span>
           </Link>
